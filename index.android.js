@@ -11,8 +11,10 @@ var {
   Text,
   View,
   TouchableNativeFeedback,
+  TouchableWithoutFeedback,
   ToastAndroid,
-  DeviceEventEmitter
+  DeviceEventEmitter,
+  Modal
 } = React;
 
 var Button = require('react-native-button');
@@ -23,7 +25,13 @@ var Dimensions = require('Dimensions');
 var {width, height} = Dimensions.get('window');
 
 var { NativeModules } = require('react-native');
-var ShakeAndroid = NativeModules.ShakeAndroid;
+
+var {
+  ShakeAndroid,
+  ScanAndroid,
+  VibrateAndroid,
+  DialogAndroid
+} = NativeModules;
 
 var Hello = React.createClass({
   getInitialState: function() {
@@ -31,8 +39,8 @@ var Hello = React.createClass({
        text : "stop" 
     };
   },
-  clicked : function() {
-      ShakeAndroid.stop();
+  scan : function() {
+      ScanAndroid.scan(null, "请扫描二维码");
   },
   componentDidMount: function() {
     ShakeAndroid.start();
@@ -40,35 +48,65 @@ var Hello = React.createClass({
         ToastAndroid.show("Shake!!!", ToastAndroid.SHORT);
     });
   },
+  componentWillUnmount: function() {
+    ShakeAndroid.stop();
+  },
   toast : function() {
     ToastAndroid.show("Shake!!!", ToastAndroid.SHORT);
   },
+  vibrate : function() {
+    VibrateAndroid.vibrate(800);
+  },
+  alert : function() {
+    DialogAndroid.alert({
+      title : "hhh",
+      content : "bbb",
+      okText : "确认"
+    }, this.vibrate.bind(this));
+  },
+  confirm : function() {
+    DialogAndroid.confirm ({
+      title : "hhh",
+      content : "bbb",
+      okText : "确定",
+      cancelText : "取消"
+    }, function() {
+      ToastAndroid.show("您点了确定", ToastAndroid.SHORT);
+    }, function() {
+      ToastAndroid.show("您点了取消", ToastAndroid.SHORT);
+    });
+  },
   render: function() {
     return (
-      <View style={{flex : 1}}>
-       <Carousel style={{width : width}} hideIndicators={true}>
-        <View style={styles.container}>
-          <Text>Page 1</Text>
+      <View style={styles.container}>
+       <TouchableWithoutFeedback onPress={this.scan} >
+       <View style={styles.item}>
+       <Text> 
+          扫描
+       </Text>
+       </View>
+       </TouchableWithoutFeedback>
+       <TouchableWithoutFeedback onPress={this.vibrate} >
+       <View style={styles.item}>
+       <Text> 
+          震动
+       </Text>
+       </View>
+       </TouchableWithoutFeedback>
+       <TouchableWithoutFeedback onPress={this.alert} >
+       <View style={styles.item}>
+        <Text> 
+          Alert
+        </Text>
         </View>
-        <View style={styles.container}>
-          <Text>Page 2</Text>
+       </TouchableWithoutFeedback>
+       <TouchableWithoutFeedback onPress={this.confirm} style={styles.item}>
+       <View style={styles.item}>
+        <Text> 
+          Confirm
+        </Text>
         </View>
-        <View style={styles.container}>
-          <Text>Page 3</Text>
-        </View>
-      </Carousel>
-        <View style={styles.openBtn}>
-          <Text>{this.state.text}</Text>
-        </View>
-        <View style={styles.menuBtn} onPress={this.clicked}>
-            <Text style={{alignSelf : "center"}}>=</Text>
-        </View>
-        <View style={{position : "absolute", right : 10, bottom : 10, backgroundColor : "#ccc", width : 30, height : 30, borderRadius:15,justifyContent: 'center',
-          alignItems: 'center',}}>
-            <Text>
-                ^
-            </Text>
-        </View>
+       </TouchableWithoutFeedback>
       </View>
     );
   }
@@ -85,36 +123,8 @@ var styles = StyleSheet.create({
     borderWidth : 1,
     borderColor : "#000"
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-  openBtn : {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width : width * 0.5,
-    height : width * 0.5,
-    backgroundColor : "#e60044",
-    borderRadius : width * 0.25,
-    position : "absolute",
-    left : width * 0.25,
-    top : width * 0.7
-  },
-  menuBtn : {
-      backgroundColor: '#ccc',
-      height: 30,
-      left : 10,
-      width : 30,
-      bottom : 10,
-      justifyContent: 'center',
-      alignItems: 'center',
-      borderRadius : 15
+  item : {
+    marginBottom : 15
   }
 });
 

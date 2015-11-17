@@ -1,4 +1,4 @@
-package com.hello.natives;
+package com.hello.natives.shake;
 
 import com.facebook.react.common.ShakeDetector;
 import com.facebook.react.bridge.NativeModule;
