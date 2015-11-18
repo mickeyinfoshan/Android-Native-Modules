@@ -11,10 +11,17 @@ import com.facebook.react.bridge.Callback;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.Activity;
+import android.widget.DatePicker;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;  
 
 public class DialogModule extends BaseJavaModule {
 	private  Activity mActivity;
+	private Boolean isCancel = false;
 
 	public DialogModule(Activity currentActivity) {
 		super();
@@ -26,20 +33,12 @@ public class DialogModule extends BaseJavaModule {
 	}
 
 	@ReactMethod
-	public void alert(ReadableMap config, final Callback cb) {
+	public void alert(ReadableMap options, final Callback cb) {
 		AlertDialog.Builder builder = createBuilder();
-		String title = "";
-		String content = "";
-		String okText = "OK";
-		if(config.hasKey("title")) {
-			title = config.getString("title");
-		}
-		if(config.hasKey("content")) {
-			content = config.getString("content");
-		}
-		if(config.hasKey("okText")) {
-			okText = config.getString("okText");
-		}
+		String title = getString(options, "title", "");
+		String content = getString(options, "content", "");
+		String okText = getString(options, "okText", "OK");
+		isCancel = false;
 		builder.setTitle(title)
 		 	   .setMessage(content)
 		 	   .setPositiveButton(okText, new DialogInterface.OnClickListener() {
@@ -52,24 +51,13 @@ public class DialogModule extends BaseJavaModule {
 	}
 
 	@ReactMethod
-	public void confirm(ReadableMap config, final Callback positiveCallback, final Callback negativeCallback) {
+	public void confirm(ReadableMap options, final Callback positiveCallback, final Callback negativeCallback) {
 		AlertDialog.Builder builder = createBuilder();
-		String title = "";
-		String content = "";
-		String okText = "OK";
-		String cancelText = "Cancel";
-		if(config.hasKey("title")) {
-			title = config.getString("title");
-		}
-		if(config.hasKey("content")) {
-			content = config.getString("content");
-		}
-		if(config.hasKey("okText")) {
-			okText = config.getString("okText");
-		}
-		if(config.hasKey("cancelText")) {
-			cancelText = config.getString("cancelText");
-		}
+		String title = getString(options, "title", "");
+		String content = getString(options, "content", "");
+		String okText = getString(options, "okText", "OK");
+		String cancelText = getString(options, "cancelText", "Cancel");
+		isCancel = false;
 		builder.setTitle(title)
 		 	   .setMessage(content)
 		 	   .setPositiveButton(okText, new DialogInterface.OnClickListener() {
@@ -80,12 +68,73 @@ public class DialogModule extends BaseJavaModule {
                })
                .setNegativeButton(cancelText, new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
-                       dialog.dismiss();
-                       negativeCallback.invoke();
+                   	   	isCancel = true;
+                    	dialog.dismiss();
+                       	negativeCallback.invoke();
                    }
                });
         builder.create().show();
 
+	}
+
+	@ReactMethod
+	public void date(ReadableMap options, final Callback getDateHandler) {
+		Calendar calendar = Calendar.getInstance();
+		Date defaultDate = new Date();
+		long[] dateOptions = getDateOptions(options);
+		defaultDate.setTime(dateOptions[0]);
+		calendar.setTime(defaultDate);
+		isCancel = false;
+		DatePickerDialog.OnDateSetListener datePickerListener 
+            = new DatePickerDialog.OnDateSetListener() {
+        			public void onDateSet(DatePicker view, int selectedYear,
+            						  int selectedMonth, int selectedDay) {
+        				if(!view.isShown() && !isCancel){
+        					getDateHandler.invoke(selectedYear, selectedMonth, selectedDay);
+        					//getDateHandler.invoke(dateOptions[0], dateOptions[1], dateOptions[2]);
+        				}        				           
+        			}
+		};
+		DatePickerDialog dialog = new DatePickerDialog(mActivity, datePickerListener,
+						calendar.get(Calendar.YEAR),  
+                        calendar.get(Calendar.MONTH),  
+                        calendar.get(Calendar.DAY_OF_MONTH)) {
+			@Override
+    		public void onDateChanged( DatePicker view, int year, int month, int day ) {
+        		super.onDateChanged( view, year, month, day );
+        		this.setTitle(year + "/" + (month + 1) + "/" + day);
+    		}
+		};
+
+		if(options.hasKey("title")) {
+			dialog.setTitle(options.getString("title"));
+		}
+		if(options.hasKey("okText")) {
+			dialog.setButton(DatePickerDialog.BUTTON_POSITIVE, options.getString("okText"), dialog);
+		}
+		
+		if(options.hasKey("cancelText")) {
+			dialog.setButton(DatePickerDialog.BUTTON_NEGATIVE, options.getString("cancelText"), new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int which) {
+       				if (which == DialogInterface.BUTTON_NEGATIVE) {
+          				isCancel = true;
+       				}
+    			}
+  			});
+		}
+
+		long minDate = dateOptions[1];
+		long maxDate = dateOptions[2];
+
+		if(minDate > 0) {
+			dialog.getDatePicker().setMinDate(minDate);
+		}
+
+		if(maxDate > 0) {
+			dialog.getDatePicker().setMaxDate(maxDate);
+		}
+
+		dialog.show();	
 	}
 
 	@Override
@@ -93,4 +142,60 @@ public class DialogModule extends BaseJavaModule {
 		return "DialogAndroid";
 	}
 	
+	private String getString(ReadableMap options, String key, String defaultStr) {
+		if(options.hasKey(key)) {
+			return options.getString(key);
+		}
+		return defaultStr;
+	}
+
+	private long[] getDateOptions(ReadableMap options) {
+		long minDate = -1;
+		long maxDate = -1;
+		long defaultDate = new Date().getTime() / 1000;
+		Boolean hasMin = false;
+		Boolean hasMax = false;
+		Boolean hasDefault = false;
+		if(options.hasKey("defaultDate")) {
+			defaultDate = options.getInt("defaultDate");
+			hasDefault = true;
+		}
+		if(options.hasKey("minDate")) {
+			minDate = options.getInt("minDate");
+			hasMin = true;
+		}
+		if(options.hasKey("maxDate")) {
+			maxDate = options.getInt("maxDate");
+			hasMax = true;
+		}
+
+		//如果当前时间比最大时间大，且当前时间没有设置，当前时间设置为最大时间
+		if(!hasDefault && !hasMin && hasMax && defaultDate > maxDate) {
+			defaultDate = maxDate - 1;
+		}
+
+		//同上
+		if(!hasDefault && hasMin && !hasMax && defaultDate < minDate) {
+			defaultDate = minDate + 1;
+		}
+
+		if(hasMin && hasDefault && defaultDate <= minDate) {
+			minDate = -1;
+		}
+
+		if(hasMax && hasDefault && defaultDate >= maxDate) {
+			maxDate = -1;
+		}
+
+		if(hasMin && hasMax && minDate >= maxDate) {
+			minDate = -1;
+			maxDate = -1;
+		}
+
+		long [] opts = new long[3];
+		opts[0] = defaultDate * 1000;
+		opts[1] = minDate * 1000;
+		opts[2] = maxDate * 1000;
+		return opts;
+	}
 }

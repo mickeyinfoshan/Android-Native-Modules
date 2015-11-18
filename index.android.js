@@ -76,6 +76,23 @@ var Hello = React.createClass({
       ToastAndroid.show("您点了取消", ToastAndroid.SHORT);
     });
   },
+  date : function() {
+    var defaultDate = new Date();
+    var minDate = new Date();
+    minDate.setMonth(0);
+    var maxDate = new Date();
+    maxDate.setMonth(11);
+    DialogAndroid.date({
+      title : "选择日期",
+      okText : "确认",
+      cancelText : "取消",
+      defaultDate : parseInt(defaultDate.getTime() / 1000),
+      minDate : parseInt(minDate.getTime() / 1000),
+      maxDate : parseInt(maxDate.getTime() / 1000)
+    },function(year, month, d) {
+      ToastAndroid.show(year + "-" + (month + 1) + "-" + d, ToastAndroid.SHORT);
+    });
+  },
   render: function() {
     return (
       <View style={styles.container}>
@@ -104,6 +121,13 @@ var Hello = React.createClass({
        <View style={styles.item}>
         <Text> 
           Confirm
+        </Text>
+        </View>
+       </TouchableWithoutFeedback>
+       <TouchableWithoutFeedback onPress={this.date} style={styles.item}>
+       <View style={styles.item}>
+        <Text> 
+          date
         </Text>
         </View>
        </TouchableWithoutFeedback>
