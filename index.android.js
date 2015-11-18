@@ -30,7 +30,9 @@ var {
   ShakeAndroid,
   ScanAndroid,
   VibrateAndroid,
-  DialogAndroid
+  DialogAndroid,
+  DialAndroid,
+  RingAndroid
 } = NativeModules;
 
 var Hello = React.createClass({
@@ -93,6 +95,23 @@ var Hello = React.createClass({
       ToastAndroid.show(year + "-" + (month + 1) + "-" + d, ToastAndroid.SHORT);
     });
   },
+  time : function() {
+    DialogAndroid.time({
+      okText : "确认",
+      cancelText : "取消",
+    }, function(hours, minutes) {
+      ToastAndroid.show(hours + ":" + minutes, ToastAndroid.SHORT);
+    });
+  },
+  dial : function() {
+    DialAndroid.dial("1234567890");
+  },
+  call : function() {
+    DialAndroid.call("18268186032");
+  },
+  beep : function() {
+    RingAndroid.beep();
+  },
   render: function() {
     return (
       <View style={styles.container}>
@@ -128,6 +147,34 @@ var Hello = React.createClass({
        <View style={styles.item}>
         <Text> 
           date
+        </Text>
+        </View>
+       </TouchableWithoutFeedback>
+       <TouchableWithoutFeedback onPress={this.time} style={styles.item}>
+       <View style={styles.item}>
+        <Text> 
+          time
+        </Text>
+        </View>
+       </TouchableWithoutFeedback>
+       <TouchableWithoutFeedback onPress={this.dial} style={styles.item}>
+       <View style={styles.item}>
+        <Text> 
+          dial
+        </Text>
+        </View>
+       </TouchableWithoutFeedback>
+       <TouchableWithoutFeedback onPress={this.call} style={styles.item}>
+       <View style={styles.item}>
+        <Text> 
+          call
+        </Text>
+        </View>
+       </TouchableWithoutFeedback>
+       <TouchableWithoutFeedback onPress={this.beep} style={styles.item}>
+       <View style={styles.item}>
+        <Text> 
+          beep
         </Text>
         </View>
        </TouchableWithoutFeedback>

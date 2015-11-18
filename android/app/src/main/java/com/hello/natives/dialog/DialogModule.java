@@ -12,15 +12,17 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.app.Activity;
 import android.widget.DatePicker;
+import android.widget.TimePicker;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;  
 
 public class DialogModule extends BaseJavaModule {
-	private  Activity mActivity;
+	private Activity mActivity;
 	private Boolean isCancel = false;
 
 	public DialogModule(Activity currentActivity) {
@@ -91,20 +93,13 @@ public class DialogModule extends BaseJavaModule {
             						  int selectedMonth, int selectedDay) {
         				if(!view.isShown() && !isCancel){
         					getDateHandler.invoke(selectedYear, selectedMonth, selectedDay);
-        					//getDateHandler.invoke(dateOptions[0], dateOptions[1], dateOptions[2]);
         				}        				           
         			}
 		};
 		DatePickerDialog dialog = new DatePickerDialog(mActivity, datePickerListener,
 						calendar.get(Calendar.YEAR),  
                         calendar.get(Calendar.MONTH),  
-                        calendar.get(Calendar.DAY_OF_MONTH)) {
-			@Override
-    		public void onDateChanged( DatePicker view, int year, int month, int day ) {
-        		super.onDateChanged( view, year, month, day );
-        		this.setTitle(year + "/" + (month + 1) + "/" + day);
-    		}
-		};
+                        calendar.get(Calendar.DAY_OF_MONTH));
 
 		if(options.hasKey("title")) {
 			dialog.setTitle(options.getString("title"));
@@ -136,6 +131,48 @@ public class DialogModule extends BaseJavaModule {
 
 		dialog.show();	
 	}
+
+	@ReactMethod
+	public void time(ReadableMap options, final Callback getTimeHandler) {
+		Calendar calendar = Calendar.getInstance();
+		Date defaultDate = new Date();
+		long[] dateOptions = getDateOptions(options);
+		defaultDate.setTime(dateOptions[0]);
+		calendar.setTime(defaultDate);
+		isCancel = false;
+		TimePickerDialog.OnTimeSetListener timePickerListener 
+            = new TimePickerDialog.OnTimeSetListener() {
+        			public void onTimeSet(TimePicker view, int hours,
+            						  int minutes) {
+        				if(!view.isShown() && !isCancel){
+        					getTimeHandler.invoke(hours, minutes);
+        				}        				           
+        			}
+		};
+		TimePickerDialog dialog = new TimePickerDialog(mActivity, timePickerListener,
+						calendar.get(Calendar.HOUR_OF_DAY),  
+                        calendar.get(Calendar.MINUTE), false);
+
+		if(options.hasKey("title")) {
+			dialog.setTitle(options.getString("title"));
+		}
+		if(options.hasKey("okText")) {
+			dialog.setButton(TimePickerDialog.BUTTON_POSITIVE, options.getString("okText"), dialog);
+		}
+		
+		if(options.hasKey("cancelText")) {
+			dialog.setButton(TimePickerDialog.BUTTON_NEGATIVE, options.getString("cancelText"), new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int which) {
+       				if (which == DialogInterface.BUTTON_NEGATIVE) {
+          				isCancel = true;
+       				}
+    			}
+  			});
+		}
+		dialog.show();	
+	}
+
+	
 
 	@Override
 	public String getName() {

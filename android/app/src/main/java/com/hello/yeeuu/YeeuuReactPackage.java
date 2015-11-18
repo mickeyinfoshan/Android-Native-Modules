@@ -14,6 +14,8 @@ import com.hello.natives.shake.ShakeModule;
 import com.hello.natives.scan.ScanModule;
 import com.hello.natives.vibrate.VibrateModule;
 import com.hello.natives.dialog.DialogModule;
+import com.hello.natives.dial.DialModule;
+import com.hello.natives.ring.RingModule;
 
 public class YeeuuReactPackage implements ReactPackage {
 
@@ -33,6 +35,8 @@ public class YeeuuReactPackage implements ReactPackage {
     modules.add(new ScanModule(mActivity));
     modules.add(new VibrateModule(reactContext));
     modules.add(new DialogModule(mActivity));
+    modules.add(new DialModule(reactContext));
+    modules.add(new RingModule(reactContext));
     return modules;
   }
 
