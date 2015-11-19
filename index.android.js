@@ -1,7 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- */
+
 'use strict';
 
 var React = require('react-native');
@@ -42,7 +39,9 @@ var Hello = React.createClass({
     };
   },
   scan : function() {
-      ScanAndroid.scan(null, "请扫描二维码");
+      ScanAndroid.scan("You can scan something now",function(result) {
+        ToastAndroid.show(result, ToastAndroid.SHORT);
+      });
   },
   componentDidMount: function() {
     ShakeAndroid.start();
@@ -61,21 +60,21 @@ var Hello = React.createClass({
   },
   alert : function() {
     DialogAndroid.alert({
-      title : "hhh",
-      content : "bbb",
-      okText : "确认"
+      title : "Title",
+      content : "Content",
+      okText : "Confirm"
     }, this.vibrate.bind(this));
   },
   confirm : function() {
     DialogAndroid.confirm ({
-      title : "hhh",
-      content : "bbb",
-      okText : "确定",
-      cancelText : "取消"
+      title : "title",
+      content : "content",
+      okText : "OK",
+      cancelText : "Cancel"
     }, function() {
-      ToastAndroid.show("您点了确定", ToastAndroid.SHORT);
+      ToastAndroid.show("You clicked OK", ToastAndroid.SHORT);
     }, function() {
-      ToastAndroid.show("您点了取消", ToastAndroid.SHORT);
+      ToastAndroid.show("You clicked Cancel", ToastAndroid.SHORT);
     });
   },
   date : function() {
@@ -85,9 +84,9 @@ var Hello = React.createClass({
     var maxDate = new Date();
     maxDate.setMonth(11);
     DialogAndroid.date({
-      title : "选择日期",
-      okText : "确认",
-      cancelText : "取消",
+      title : "Pick your date",
+      okText : "Done",
+      cancelText : "Cancel",
       defaultDate : parseInt(defaultDate.getTime() / 1000),
       minDate : parseInt(minDate.getTime() / 1000),
       maxDate : parseInt(maxDate.getTime() / 1000)
@@ -97,8 +96,8 @@ var Hello = React.createClass({
   },
   time : function() {
     DialogAndroid.time({
-      okText : "确认",
-      cancelText : "取消",
+      okText : "Done",
+      cancelText : "Cancel",
     }, function(hours, minutes) {
       ToastAndroid.show(hours + ":" + minutes, ToastAndroid.SHORT);
     });
@@ -118,14 +117,14 @@ var Hello = React.createClass({
        <TouchableWithoutFeedback onPress={this.scan} >
        <View style={styles.item}>
        <Text> 
-          扫描
+          Scan
        </Text>
        </View>
        </TouchableWithoutFeedback>
        <TouchableWithoutFeedback onPress={this.vibrate} >
        <View style={styles.item}>
        <Text> 
-          震动
+          Vibrate
        </Text>
        </View>
        </TouchableWithoutFeedback>

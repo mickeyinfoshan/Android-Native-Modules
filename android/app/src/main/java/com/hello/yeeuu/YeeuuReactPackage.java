@@ -17,11 +17,13 @@ import com.hello.natives.dialog.DialogModule;
 import com.hello.natives.dial.DialModule;
 import com.hello.natives.ring.RingModule;
 
+import com.hello.MainActivity;
+
 public class YeeuuReactPackage implements ReactPackage {
 
-  private Activity mActivity;
+  private MainActivity mActivity;
 
-  public YeeuuReactPackage(Activity currentActivity) {
+  public YeeuuReactPackage(MainActivity currentActivity) {
     super();
     mActivity = currentActivity;
   }
