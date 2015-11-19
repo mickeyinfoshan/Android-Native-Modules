@@ -63,13 +63,13 @@ The callback function takes 3 arguments, which are **year**(full year), **month*
 
 The callback function takes 2 arguments, which are **hours** and **minutes**. 
 
-### ScanAndroid
+## ScanAndroid
 
 A module scans codes(e.g. qrcode). Thanks to @[rkistner](https://github.com/rkistner)'s [zxing-android-embedded](https://github.com/journeyapps/zxing-android-embedded)!
 
 More options will be added in the future.
 
-## Method 
+### Method 
 
 	static scan(prompt: String, callback: Function(result: String))
 
