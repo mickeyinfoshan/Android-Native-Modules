@@ -155,9 +155,21 @@ public class DialogModule extends BaseJavaModule {
 			is24HourView = options.getBoolean("is24HourView");
 		}
 
+		int hour = calendar.get(Calendar.HOUR_OF_DAY);
+		int minute = calendar.get(Calendar.MINUTE);
+
+		if(options.hasKey("hour")) {
+			hour = options.getInt("hour");
+		}
+
+		if(options.hasKey("minute")) {
+			minute = options.getInt("minute");
+		}
+
 		TimePickerDialog dialog = new TimePickerDialog(mActivity, timePickerListener,
-						calendar.get(Calendar.HOUR_OF_DAY),  
-                        calendar.get(Calendar.MINUTE), is24HourView);
+						hour,  
+                        minute, 
+                        is24HourView);
 
 		if(options.hasKey("title")) {
 			dialog.setTitle(options.getString("title"));

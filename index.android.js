@@ -95,6 +95,8 @@ var Hello = React.createClass({
     DialogAndroid.time({
       okText : "Done",
       cancelText : "Cancel",
+      hour : 15,
+      minute : 20,
       is24HourView : true
     }, function(hours, minutes) {
       ToastAndroid.show(hours + ":" + minutes, ToastAndroid.SHORT);
