@@ -1,5 +1,5 @@
-# Native-Modules-Example
-A react-native app example(Android) uses some native modules.
+# Android-Native-Modules
+A react-native app uses some native modules. (Android)
 
 # Native Modules
 
