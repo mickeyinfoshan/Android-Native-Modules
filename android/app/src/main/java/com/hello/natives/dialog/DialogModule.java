@@ -91,7 +91,7 @@ public class DialogModule extends BaseJavaModule {
             = new DatePickerDialog.OnDateSetListener() {
         			public void onDateSet(DatePicker view, int selectedYear,
             						  int selectedMonth, int selectedDay) {
-        				if(!view.isShown() && !isCancel){
+        				if(view.isShown() && !isCancel){
         					getDateHandler.invoke(selectedYear, selectedMonth, selectedDay);
         				}        				           
         			}
@@ -144,14 +144,20 @@ public class DialogModule extends BaseJavaModule {
             = new TimePickerDialog.OnTimeSetListener() {
         			public void onTimeSet(TimePicker view, int hours,
             						  int minutes) {
-        				if(!view.isShown() && !isCancel){
+        				if(view.isShown() && !isCancel){
         					getTimeHandler.invoke(hours, minutes);
         				}        				           
         			}
 		};
+
+		Boolean is24HourView = false;
+		if(options.hasKey("is24HourView")) {
+			is24HourView = options.getBoolean("is24HourView");
+		}
+
 		TimePickerDialog dialog = new TimePickerDialog(mActivity, timePickerListener,
 						calendar.get(Calendar.HOUR_OF_DAY),  
-                        calendar.get(Calendar.MINUTE), false);
+                        calendar.get(Calendar.MINUTE), is24HourView);
 
 		if(options.hasKey("title")) {
 			dialog.setTitle(options.getString("title"));
@@ -159,7 +165,7 @@ public class DialogModule extends BaseJavaModule {
 		if(options.hasKey("okText")) {
 			dialog.setButton(TimePickerDialog.BUTTON_POSITIVE, options.getString("okText"), dialog);
 		}
-		
+
 		if(options.hasKey("cancelText")) {
 			dialog.setButton(TimePickerDialog.BUTTON_NEGATIVE, options.getString("cancelText"), new DialogInterface.OnClickListener() {
     			public void onClick(DialogInterface dialog, int which) {
@@ -206,12 +212,10 @@ public class DialogModule extends BaseJavaModule {
 			hasMax = true;
 		}
 
-		//如果当前时间比最大时间大，且当前时间没有设置，当前时间设置为最大时间
 		if(!hasDefault && !hasMin && hasMax && defaultDate > maxDate) {
 			defaultDate = maxDate - 1;
 		}
 
-		//同上
 		if(!hasDefault && hasMin && !hasMax && defaultDate < minDate) {
 			defaultDate = minDate + 1;
 		}

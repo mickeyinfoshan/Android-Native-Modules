@@ -29,7 +29,8 @@ var {
   VibrateAndroid,
   DialogAndroid,
   DialAndroid,
-  RingAndroid
+  RingAndroid,
+  ContactAndroid
 } = NativeModules;
 
 var Hello = React.createClass({
@@ -98,6 +99,7 @@ var Hello = React.createClass({
     DialogAndroid.time({
       okText : "Done",
       cancelText : "Cancel",
+      is24HourView : true
     }, function(hours, minutes) {
       ToastAndroid.show(hours + ":" + minutes, ToastAndroid.SHORT);
     });
@@ -110,6 +112,11 @@ var Hello = React.createClass({
   },
   beep : function() {
     RingAndroid.beep();
+  },
+  contacts : function() {
+    ContactAndroid.selectContact(function(name, phone) {
+      ToastAndroid.show(name + "-" + phone, ToastAndroid.SHORT);
+    });
   },
   render: function() {
     return (
@@ -174,6 +181,13 @@ var Hello = React.createClass({
        <View style={styles.item}>
         <Text> 
           beep
+        </Text>
+        </View>
+       </TouchableWithoutFeedback>
+        <TouchableWithoutFeedback onPress={this.contacts} style={styles.item}>
+       <View style={styles.item}>
+        <Text> 
+          contacts
         </Text>
         </View>
        </TouchableWithoutFeedback>
