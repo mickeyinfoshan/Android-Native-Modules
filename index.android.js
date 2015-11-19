@@ -14,10 +14,6 @@ var {
   Modal
 } = React;
 
-var Button = require('react-native-button');
-
-var Carousel = require('react-native-carousel');
-
 var Dimensions = require('Dimensions');
 var {width, height} = Dimensions.get('window');
 
